@@ -3,4 +3,295 @@
   <groupId>florenceConsultingProject</groupId>
   <artifactId>florenceConsultingProject</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <name>florence-consulting-project</name>
+	<description>App with User CRUD</description>
+	
+	<developers>
+		<developer>
+			<name>Vincenzo Di Maso</name>
+			<email>dimasovincenzo1999@gmail.com</email>
+		</developer>
+	</developers>
+	
+	<repositories>
+		<repository>
+			<id>confluent</id>
+			<url>https://packages.confluent.io/maven/</url>
+		</repository>
+	</repositories>
+
+	<properties>
+		<!-- Property generiche -->
+		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+		<java.version>17</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<!-- Property specifiche progetto -->
+		<app.classname>com.florenceConsultingProject.app.FlorenceConsultingApp</app.classname>
+		
+		<!-- Dipendeze librerie applicative -->
+		<spring.boot.dependencies.version>2.5.0
+		</spring.boot.dependencies.version>
+		<spring-cloud.version>2021.0.1</spring-cloud.version>
+		<avro.version>1.11.0</avro.version>
+		<kafka.avro.serializer.version>7.0.1</kafka.avro.serializer.version>
+		<posgresql.version>42.3.3</posgresql.version>
+		<hibernate.version>5.4.32.Final</hibernate.version>
+		<commons-lang3.version>3.8.1</commons-lang3.version>
+		<commons-dbcp2.version>2.5.0</commons-dbcp2.version>
+		<schema.registry.mock.version>2.5.3</schema.registry.mock.version>
+		<logback.version>1.2.10</logback.version>
+		<slf4j.version>1.7.35</slf4j.version>
+		<oracle.driver.version>19.3.0.0.0</oracle.driver.version>
+	</properties>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring.boot.dependencies.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
+	<dependencies>
+		
+		<!-- Spring-Boot imports -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-kotlin</artifactId>
+		</dependency>
+
+		<!-- Dipendenze Kafka si deve importare kafka_2.13 perché importata da 
+			kafka-test e quindi sovrascritta -->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka_2.13</artifactId>
+		</dependency>
+
+		<!-- Monitoraggio applicazione -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Queste due dipendenze servono per i serializer e deserializer confluent -->
+		<dependency>
+			<groupId>org.apache.avro</groupId>
+			<artifactId>avro</artifactId>
+			<version>${avro.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>io.confluent</groupId>
+			<artifactId>kafka-avro-serializer</artifactId>
+			<version>${kafka.avro.serializer.version}</version>
+		</dependency>
+
+
+		<!-- Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+		</dependency>
+
+		<!-- Driver Postgresql -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${posgresql.version}</version>
+		</dependency>
+
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+
+		<!-- Test dependencies -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bakdata.fluent-kafka-streams-tests</groupId>
+			<artifactId>schema-registry-mock-junit5</artifactId>
+			<version>${schema.registry.mock.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring.boot.dependencies.version}</version>
+				<configuration>
+					<mainClass>${app.classname}</mainClass>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- COMPILER PLUGIN -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.9.0</version>
+				<configuration>
+					<release>${java.version}</release>
+					<showDeprecation>true</showDeprecation>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<!-- TESTS PLUGIN -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+			</plugin>
+
+			<!-- JACOCO PLUGIN -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.7</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>external.atlassian.jgitflow</groupId>
+				<artifactId>jgitflow-maven-plugin</artifactId>
+				<version>1.0-m5.1</version>
+				<configuration>
+					<username>${git.user}</username>
+					<password>${git.password}</password>
+					<!-- Enable this to push to origin using SSH keys modifico -->
+					<!-- <enableSshAgent>true</enableSshAgent> -->
+					<!-- Keep your maven submodules at the same version as the parent POM -->
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<!-- Pusing in-development features to origin allows all devs to see 
+						what each other are working on -->
+					<pushFeatures>true</pushFeatures>
+					<!-- This allows the CI server (e.g. Jenkins) to automatically push 
+						new releases to origin; you can then either manually deploy them or, if you 
+						are doing Continuous Deployments, auto-deploy them to prod -->
+					<pushReleases>true</pushReleases>
+					<!-- Hot Fixes should be pushed to origin as well so that any dev can 
+						pick them up -->
+					<pushHotfixes>true</pushHotfixes>
+					<!-- Prevents deployments from dev workstations so that they can be 
+						done by a CI server -->
+					<noDeploy>true</noDeploy>
+					<noReleaseBuild>true</noReleaseBuild>
+					<noReleaseMerge>false</noReleaseMerge>
+					<allowUntracked>true</allowUntracked>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<goals>
+							<goal>feature-start</goal>
+							<goal>hotfix-start</goal>
+						</goals>
+						<configuration>
+							<allowSnapshots>true</allowSnapshots>
+							<allowUntracked>true</allowUntracked>
+							<pushFeatures>true</pushFeatures>
+							<pushHotfixes>true</pushHotfixes>
+							<flowInitContext>
+								<masterBranchName>main</masterBranchName>
+								<developBranchName>develop</developBranchName>
+							</flowInitContext>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
