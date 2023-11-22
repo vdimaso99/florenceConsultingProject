@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: Swagger User CRUD - OpenAPI 3.0
+  description: Api per accesso dati entità User
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: "0.2"
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://localhost/api/v1
+tags:
+- name: User
+  description: CRUD for User entity
+  externalDocs:
+    description: Find out more
+    url: http://swagger.io
+paths:
+  /user/create:
+    post:
+      tags:
+      - user
+      summary: Inserisce user in database
+      description: Restituisce l'identificativo dello user inserito in database
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: integer
+        "404":
+          description: Inserimento non riuscito.
+  /user/read:
+    get:
+      tags:
+      - user
+      summary: Ricerca user sul database
+      description: Restituisce una lista di user presenti sul database
+      operationId: readUser
+      responses:
+        "200":
+          description: Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        "404":
+          description: Oggetto non trovato.
+  /user/update:
+    put:
+      tags:
+      - user
+      summary: Aggiorna User sul database
+      description: Restituisce OK se l'aggiornamento è andato a buon fine
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: query
+        description: Identificativo User
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Oggetto non trovato.
+  /user/delete:
+    delete:
+      tags:
+      - user
+      summary: Elimina User dal database
+      description: Restituisce OK se la cancellazione è andata a buon fine
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: query
+        description: Identificativo User
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Oggetto non trovato.
+  /user/readBy:
+    get:
+      tags:
+      - user
+      summary: "Ricerca user sul database tramite , opzionalmente, nome o cognome\
+        \ o entrambi"
+      description: Restituisce una lista di user presenti sul database per i parametri
+        opzionali
+      operationId: readUserByNameAndSurname
+      parameters:
+      - name: name
+        in: query
+        description: Nome User
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: Vincenzo
+      - name: surname
+        in: query
+        description: Cognome User
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: Di Maso
+      responses:
+        "200":
+          description: Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        "404":
+          description: Oggetto non trovato.
+  /user/createByFile:
+    post:
+      tags:
+      - user
+      summary: Inserisce user o più user sul database tramite file CSV
+      description: Restituisce l'identificativo di ogni user inserito in database
+      operationId: createUserByFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                # 'file' will be the field name in this multipart request
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        "404":
+          description: Oggetto non trovato.
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identificativo utente
+          example: 1
+        name:
+          type: string
+          description: Nome
+          example: Vincenzo
+        surname:
+          type: string
+          description: Cognome
+          example: Di Maso
+        email:
+          type: string
+          description: Indirizzo email
+          example: dimasovincenzo1999@gmail.com
+        address:
+          type: string
+          description: Indirizzo residenza
+          example: Via Rossi

@@ -29,21 +29,23 @@
 
 		<!-- Property specifiche progetto -->
 		<app.classname>com.florenceConsultingProject.app.FlorenceConsultingApp</app.classname>
+		<default.package>com.florenceConsultingProject.apiuser</default.package>
 		
 		<!-- Dipendeze librerie applicative -->
-		<spring.boot.dependencies.version>2.5.0
-		</spring.boot.dependencies.version>
+		<spring.boot.dependencies.version>2.5.0</spring.boot.dependencies.version>
 		<spring-cloud.version>2021.0.1</spring-cloud.version>
-		<avro.version>1.11.0</avro.version>
-		<kafka.avro.serializer.version>7.0.1</kafka.avro.serializer.version>
 		<posgresql.version>42.3.3</posgresql.version>
 		<hibernate.version>5.4.32.Final</hibernate.version>
+		<hibernate.validator>7.0.1.Final</hibernate.validator>
 		<commons-lang3.version>3.8.1</commons-lang3.version>
 		<commons-dbcp2.version>2.5.0</commons-dbcp2.version>
-		<schema.registry.mock.version>2.5.3</schema.registry.mock.version>
 		<logback.version>1.2.10</logback.version>
 		<slf4j.version>1.7.35</slf4j.version>
 		<oracle.driver.version>19.3.0.0.0</oracle.driver.version>
+		<jackson.databind.nullable>0.2.0</jackson.databind.nullable>
+		
+		<hypersistence-utils.version>3.3.2</hypersistence-utils.version>
+		
 	</properties>
 
 
@@ -108,22 +110,7 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
-		<!-- Queste due dipendenze servono per i serializer e deserializer confluent -->
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-
-
-		<dependency>
-			<groupId>io.confluent</groupId>
-			<artifactId>kafka-avro-serializer</artifactId>
-			<version>${kafka.avro.serializer.version}</version>
-		</dependency>
-
-
+		
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -133,6 +120,17 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-55</artifactId>
+			<version>${hypersistence-utils.version}</version>
 		</dependency>
 
 		<!-- Driver Postgresql -->
@@ -156,14 +154,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>com.bakdata.fluent-kafka-streams-tests</groupId>
-			<artifactId>schema-registry-mock-junit5</artifactId>
-			<version>${schema.registry.mock.version}</version>
-			<scope>test</scope>
-		</dependency>
-
+		
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
@@ -175,6 +166,25 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<!-- For documentation of openApi
+		 -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.6.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-webmvc-core</artifactId>
+			<version>1.6.14</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>${jackson.databind.nullable}</version>
 		</dependency>
 
 	</dependencies>
@@ -196,6 +206,54 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+						<groupId>org.openapitools</groupId>
+						<artifactId>openapi-generator-maven-plugin</artifactId>
+						<version>6.6.0</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<id>buildApi</id>
+								<configuration>
+									<!-- path to the specification -->
+									<inputSpec>${project.basedir}/src/main/resources/swagger/api-user.yaml</inputSpec>
+									<!--https://openapi-generator.tech/docs/generators/spring <modelNameSuffix>${default.package}</modelNameSuffix> 
+									<library>spring-boot</library>
+									-->
+									<generatorName>spring</generatorName>
+									
+									<generateApis>true</generateApis>
+									<requestMappingMode>api_interface</requestMappingMode>
+									<generateModels>true</generateModels>
+									<generateApiTests>true</generateApiTests>
+									<generateApiDocumentation>true</generateApiDocumentation>
+									<generateModelTests>true</generateModelTests>
+									<generateModelDocumentation>true</generateModelDocumentation>
+									<generateSupportingFiles>true</generateSupportingFiles>
+									<documentationProvider>springdoc</documentationProvider>
+									<!-- configuration -->
+									<configOptions>
+										<!--
+									Generate Api thad use jakarta.validation
+									<useSpringBoot3>true</useSpringBoot3>
+								-->
+										<library>spring-boot</library>
+										<interfaceOnly>true</interfaceOnly>
+										<useBeanValidation>true</useBeanValidation>
+										<performBeanValidation>true</performBeanValidation>
+										<modelPackage>${default.package}.model</modelPackage>
+										<apiPackage>${default.package}.apidefinition</apiPackage>
+										<sourceFolder>/src/main/java</sourceFolder>
+										<implFolder>/src/main/java</implFolder>
+										<serializableModel>true</serializableModel>
+										<delegatedelegatePattern>true</delegatedelegatePattern>
+									</configOptions>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 			<!-- COMPILER PLUGIN -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
