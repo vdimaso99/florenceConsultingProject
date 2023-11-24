@@ -5,7 +5,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: "0.2"
+  version: "0.5"
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -65,22 +65,19 @@ paths:
       summary: Aggiorna User sul database
       description: Restituisce OK se l'aggiornamento è andato a buon fine
       operationId: updateUser
-      parameters:
-      - name: id
-        in: query
-        description: Identificativo User
+      requestBody:
         required: true
-        style: form
-        explode: true
-        schema:
-          type: integer
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
       responses:
         "200":
           description: Operazione effettuata con successo.
           content:
             application/json:
               schema:
-                type: string
+                type: integer
         "404":
           description: Oggetto non trovato.
   /user/delete:
@@ -105,7 +102,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: integer
         "404":
           description: Oggetto non trovato.
   /user/readBy:

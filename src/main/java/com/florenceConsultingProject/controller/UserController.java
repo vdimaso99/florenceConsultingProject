@@ -35,10 +35,10 @@ public class UserController implements UserApi {
 	public ResponseEntity<Integer> createUser(@NotNull @Valid User user) {
 		
 		log.info("Create user :  {}", user);
-		var userOptional = this.service.createUser(user);
+		var response = this.service.createUser(user);
 		
-		if (userOptional.isPresent()) {
-			return new ResponseEntity<Integer>(userOptional.get(), HttpStatus.OK);
+		if (response.isPresent()) {
+			return new ResponseEntity<Integer>(response.get(), HttpStatus.OK);
 		}
 		
 		log.info("No data found!");
@@ -49,10 +49,10 @@ public class UserController implements UserApi {
 	public ResponseEntity<List<User>> readUser() {
 		
 		log.info("Read a list of user contained in database!");
-		var users = this.service.readUser();
+		var response = this.service.readUser();
 		
-		if (users.isPresent()) {
-			return new ResponseEntity<List<User>>(users.get(), HttpStatus.OK);
+		if (response.isPresent()) {
+			return new ResponseEntity<List<User>>(response.get(), HttpStatus.OK);
 		}
 		
 		log.info("No data found!");
@@ -60,18 +60,45 @@ public class UserController implements UserApi {
 	}
 	
 	@Override
-	public ResponseEntity<String> updateUser(@NotNull @Valid Integer id) {
-		return UserApi.super.updateUser(id);
+	public ResponseEntity<Integer> updateUser(@Valid User user) {
+		
+		log.info("Update user with id : {}", user.getId());
+		var response = this.service.updateUser(user);
+		
+		if (response.isPresent()) {
+			return new ResponseEntity<Integer>(response.get(), HttpStatus.OK);
+		}
+		
+		log.info("No data found!");
+		return new ResponseEntity<Integer>(HttpStatus.NOT_FOUND);
 	}
 	
 	@Override
-	public ResponseEntity<String> deleteUser(@NotNull @Valid Integer id) {
-		return UserApi.super.deleteUser(id);
+	public ResponseEntity<Integer> deleteUser(@NotNull @Valid Integer id) {
+		
+		log.info("Delete user with id : {}", id);
+		var response = this.service.deleteUser(id);
+		
+		if (response.isPresent()) {
+			return new ResponseEntity<Integer>(response.get(), HttpStatus.OK);
+		}
+		
+		log.info("No data found!");
+		return new ResponseEntity<Integer>(HttpStatus.NOT_FOUND);	
 	}
 	
 	@Override
 	public ResponseEntity<List<User>> readUserByNameAndSurname(@Valid String name, @Valid String surname) {
-		return UserApi.super.readUserByNameAndSurname(name, surname);
+		
+		log.info("Read user by name : {} or surname : {} or both!", name, surname);
+		var response = this.service.readUserByNameAndSurname(name, surname);
+		
+		if (response.isPresent()) {
+			return new ResponseEntity<List<User>>(response.get(), HttpStatus.OK);
+		}
+		
+		log.info("No data found!");
+		return new ResponseEntity<List<User>>(HttpStatus.NOT_FOUND);
 	}
 	
 	@Override
